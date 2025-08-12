@@ -1,0 +1,37 @@
+{
+  "name": "typescript_catatuang_api",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Achmad Rizky Kurniawan",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "winston": "^3.17.0",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-typescript": "^7.27.1",
+    "@jest/globals": "^30.0.5",
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "babel-jest": "^30.0.5",
+    "jest": "^30.0.5",
+    "prisma": "^6.13.0",
+    "supertest": "^7.1.4",
+    "typescript": "^5.9.2"
+  }
+}
