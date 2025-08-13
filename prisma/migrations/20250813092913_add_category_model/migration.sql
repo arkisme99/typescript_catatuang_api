@@ -4,9 +4,9 @@ CREATE TABLE `categories` (
     `name` VARCHAR(50) NOT NULL,
     `type` VARCHAR(25) NOT NULL,
     `images` VARCHAR(150) NULL,
-    `created_at` TIMESTAMP(0) NULL,
-    `updated_at` TIMESTAMP(0) NULL,
     `user_id` INTEGER NOT NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updated_at` TIMESTAMP(0) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

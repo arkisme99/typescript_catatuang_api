@@ -5,17 +5,17 @@ export type UserResponse = {
   id: number;
   username: string;
   name: string;
-  email?: string | null;
-  avatar?: string | null; //bisa tampil tapi isinya null
-  token?: string;
-  created_at?: string | null;
-  updated_at?: string | null;
+  email: string | null;
+  avatar: string | null;
+  token?: string; //bisa tidak tampil
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type CreateUserRequest = {
   username: string;
   name: string;
-  email: string;
+  email?: string;
   password: string;
   avatar?: string;
   created_at?: string;

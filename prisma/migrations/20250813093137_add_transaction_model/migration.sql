@@ -9,7 +9,7 @@ CREATE TABLE `transactions` (
     `type` VARCHAR(25) NOT NULL,
     `category_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
-    `created_at` TIMESTAMP(0) NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updated_at` TIMESTAMP(0) NULL,
 
     PRIMARY KEY (`id`)

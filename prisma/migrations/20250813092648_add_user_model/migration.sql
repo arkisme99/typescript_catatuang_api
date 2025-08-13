@@ -7,7 +7,7 @@ CREATE TABLE `users` (
     `email` VARCHAR(100) NULL,
     `token` VARCHAR(100) NULL,
     `avatar` VARCHAR(150) NULL,
-    `created_at` TIMESTAMP(0) NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updated_at` TIMESTAMP(0) NULL,
 
     UNIQUE INDEX `users_username_key`(`username`),
