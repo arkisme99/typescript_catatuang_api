@@ -5,5 +5,6 @@ import { AuthenticationController } from "../controller/auth-controller";
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
 
-//auth profile
+//profile
 apiRouter.get("/api/auth/profile", AuthenticationController.profile);
+apiRouter.patch("/api/auth/profile", AuthenticationController.update);

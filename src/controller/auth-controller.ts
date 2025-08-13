@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { CreateUserRequest, LoginUserRequest } from "../model/user-model";
+import {
+  CreateUserRequest,
+  LoginUserRequest,
+  UpdateProfileRequest,
+} from "../model/user-model";
 import { AuthService } from "../service/auth-service";
 import { successResponse } from "../application/data-state";
 import { UserRequest } from "../type/user-request";
@@ -37,6 +41,19 @@ export class AuthenticationController {
       res
         .status(200)
         .json(successResponse("Get User Profile Success", response));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async update(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const request = req.body as UpdateProfileRequest;
+      const response = await AuthService.update(req.user!, request);
+
+      res
+        .status(200)
+        .json(successResponse("Update User Profile Success", response));
     } catch (e) {
       next(e);
     }

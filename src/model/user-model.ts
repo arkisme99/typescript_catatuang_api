@@ -18,13 +18,18 @@ export type CreateUserRequest = {
   email?: string;
   password: string;
   avatar?: string;
-  created_at?: string;
-  updated_at?: string;
 };
 
 export type LoginUserRequest = {
   username: string;
   password: string;
+};
+
+export type UpdateProfileRequest = {
+  name?: string;
+  email?: string;
+  password?: string;
+  avatar?: string;
 };
 
 export function toUserResponse(user: User): UserResponse {

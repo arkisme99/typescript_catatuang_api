@@ -4,6 +4,7 @@
 - [Login](#login)
 - [Logout](#logout)
 - [Profile](#profile)
+- [Update Profile](#update-profile)
 
 ---
 
@@ -114,6 +115,43 @@
     "id": 1,
     "name": "John Doe",
     "email": "john@example.com",
+    "avatar": null
+  }
+}
+```
+
+---
+
+## Update Profile
+
+#### Endpoint : PATCH `/api/auth/profile`
+
+**Request Header :**
+
+- X-API-TOKEN : token
+
+**Request Body :**
+
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secret123",
+  "avatar": null
+}
+```
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Update Profile Success",
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "secret123",
     "avatar": null
   }
 }
