@@ -1,5 +1,7 @@
 # Catat Uang API
 
+Aplikasi nodejs - typescript, dengan pattern MVC + Service Pattern
+
 ## 1. Overview
 
 Aplikasi Catat Keuangan Harian menyediakan API untuk:

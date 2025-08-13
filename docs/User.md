@@ -119,7 +119,9 @@
     "id": 1,
     "name": "John Doe",
     "email": "john@example.com",
-    "avatar": null
+    "avatar": null,
+    "created_at": "2025-08-01 10:00:01",
+    "updated_at": "2025-08-01 10:00:01"
   }
 }
 ```
