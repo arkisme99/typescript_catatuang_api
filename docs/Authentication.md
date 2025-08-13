@@ -27,13 +27,14 @@
 
 ```json
 {
+  "username": "johndoe",
   "name": "John Doe",
   "email": "john@example.com",
   "password": "secret123"
 }
 ```
 
-**Success Response (200):**
+**Success Response (201):**
 
 ```json
 {
@@ -41,6 +42,7 @@
   "message": "User registered successfully",
   "data": {
     "id": 1,
+    "username": "johndoe",
     "name": "John Doe",
     "email": "john@example.com",
     "avatar": null

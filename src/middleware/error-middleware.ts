@@ -10,7 +10,8 @@ export const errorMiddleware = async (
   next: NextFunction
 ) => {
   if (error instanceof ZodError) {
-    const fieldErrors = JSON.stringify(error);
+    // const fieldErrors = JSON.stringify(error);
+    const fieldErrors = JSON.parse(error.message);
     res.status(400).json(errorResponse("Validation Error", fieldErrors));
   } else if (error instanceof ResponseError) {
     res.status(error.status).json(errorResponse(error.message));
