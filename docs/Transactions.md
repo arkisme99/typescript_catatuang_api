@@ -114,7 +114,8 @@
   "category_id": 1,
   "description": "Gaji Bulan Juli 2025",
   "amount": 25000000,
-  "type": "income"
+  "type": "income",
+  "user_id": 1
 }
 ```
 

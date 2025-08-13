@@ -118,7 +118,8 @@
     "id": 1,
     "name": "Gaji Kantor",
     "type": "income",
-    "images": null
+    "images": null,
+    "user_id": 1
   }
 }
 ```
