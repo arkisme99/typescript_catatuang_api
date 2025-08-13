@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import {
@@ -72,5 +73,9 @@ export class AuthService {
     response.token = user.token!;
 
     return response;
+  }
+
+  static async profile(user: User): Promise<UserResponse> {
+    return toUserResponse(user);
   }
 }

@@ -89,3 +89,38 @@ describe("POST /api/auth/login", () => {
     expect(response.body.data.token).toBeDefined();
   });
 });
+
+describe("GET /api/auth/profile", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+
+  it("should be success get profile", async () => {
+    const response = await supertest(web).get("/api/auth/profile").set({
+      "X-API-TOKEN": "test",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.username).toBe("test");
+    expect(response.body.data.name).toBe("Test Doe");
+  });
+
+  it("should be reject get profile if token invalid", async () => {
+    const response = await supertest(web).get("/api/auth/profile").set({
+      "X-API-TOKEN": "salah",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+});

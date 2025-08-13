@@ -109,7 +109,7 @@
 ```json
 {
   "success": true,
-  "message": "Get Data Success",
+  "message": "Get User Profile Success",
   "data": {
     "id": 1,
     "name": "John Doe",

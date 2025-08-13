@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { CreateUserRequest, LoginUserRequest } from "../model/user-model";
 import { AuthService } from "../service/auth-service";
 import { successResponse } from "../application/data-state";
+import { UserRequest } from "../type/user-request";
 
 export class AuthenticationController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -25,6 +26,17 @@ export class AuthenticationController {
       res
         .status(200)
         .json(successResponse("User logged in successfully", response));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async profile(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const response = await AuthService.profile(req.user!);
+      res
+        .status(200)
+        .json(successResponse("Get User Profile Success", response));
     } catch (e) {
       next(e);
     }
