@@ -8,13 +8,39 @@
 
 ---
 
+**Request Body:**
+
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secret123",
+  "avatar": null
+}
+```
+
+**Data Response:**
+
+```json
+{
+  "id": 1,
+  "username": "johndoe",
+  "name": "John Doe",
+  "email": null,
+  "password": "secret123",
+  "avatar": null,
+  "created_at": "2025-01-01 10:00:55",
+  "updated_at": "2025-01-01 10:00:55"
+}
+```
+
 **Error Response (4xx / 5xx):**
 
 ```json
 {
   "success": false,
   "message": "Something Errors",
-  "errors": null
+  "errors": null // null | error (object)
 }
 ```
 
@@ -34,12 +60,7 @@
 {
   "success": true,
   "message": "Get Data Success",
-  "data": {
-    "id": 2,
-    "name": "Lorem Ipsum",
-    "email": "lorem@example.com",
-    "avatar": null
-  }
+  "data": "" //Data Response
 }
 ```
 
@@ -66,20 +87,7 @@
 {
   "success": true,
   "message": "Get Data Success",
-  "data": [
-    {
-      "id": 1,
-      "name": "Jhon Doe",
-      "email": "Jhon Doe@example.com",
-      "avatar": null
-    },
-    {
-      "id": 2,
-      "name": "Lorem Ipsum",
-      "email": "lorem@example.com",
-      "avatar": null
-    }
-  ],
+  "data": [], //Data Response
   "paging": {
     "current_page": 1,
     "total_page": 10,
@@ -101,12 +109,7 @@
 **Request Body :**
 
 ```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "secret123",
-  "avatar": null
-}
+// Request Body
 ```
 
 **Success Response (201):**
@@ -115,14 +118,7 @@
 {
   "success": true,
   "message": "Create Data Success",
-  "data": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com",
-    "avatar": null,
-    "created_at": "2025-08-01 10:00:01",
-    "updated_at": "2025-08-01 10:00:01"
-  }
+  "data": "" //Data Response
 }
 ```
 
@@ -130,7 +126,7 @@
 
 ## Update User
 
-#### Endpoint : PUT `/api/users/:id`
+#### Endpoint : PATCH `/api/users/:id`
 
 **Request Header :**
 
@@ -139,11 +135,7 @@
 **Request Body :**
 
 ```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "secret123"
-}
+// Request Body
 ```
 
 **Success Response (200):**
@@ -152,11 +144,7 @@
 {
   "success": true,
   "message": "Update Data Success",
-  "data": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com"
-  }
+  "data": "" //Data Response
 }
 ```
 
