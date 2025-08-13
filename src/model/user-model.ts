@@ -22,6 +22,11 @@ export type CreateUserRequest = {
   updated_at?: string;
 };
 
+export type LoginUserRequest = {
+  username: string;
+  password: string;
+};
+
 export function toUserResponse(user: User): UserResponse {
   return {
     id: user.id,

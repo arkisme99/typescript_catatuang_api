@@ -60,7 +60,7 @@
 
 ```json
 {
-  "email": "john@example.com",
+  "username": "johndoe",
   "password": "secret123"
 }
 ```

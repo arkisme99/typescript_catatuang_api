@@ -38,3 +38,54 @@ describe("POST /api/auth/register", () => {
     expect(response.body.data.name).toBe("Test Doe");
   });
 });
+
+describe("POST /api/auth/login", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+
+  it("should reject login if username is wrong", async () => {
+    const response = await supertest(web).post("/api/auth/login").send({
+      username: "wrong",
+      password: "test",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject login if password is wrong", async () => {
+    const response = await supertest(web).post("/api/auth/login").send({
+      username: "test",
+      password: "wrong",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should success login", async () => {
+    const response = await supertest(web).post("/api/auth/login").send({
+      username: "test",
+      password: "test",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.username).toBe("test");
+    expect(response.body.data.name).toBe("Test Doe");
+    expect(response.body.data.token).toBeDefined();
+  });
+});

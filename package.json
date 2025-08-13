@@ -21,6 +21,7 @@
     "bcrypt": "^6.0.0",
     "date-fns": "^4.1.0",
     "express": "^5.1.0",
+    "uuid": "^11.1.0",
     "winston": "^3.17.0",
     "zod": "^4.0.17"
   },
@@ -32,6 +33,7 @@
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/supertest": "^6.0.3",
+    "@types/uuid": "^10.0.0",
     "babel-jest": "^30.0.5",
     "jest": "^30.0.5",
     "prisma": "^6.13.0",
