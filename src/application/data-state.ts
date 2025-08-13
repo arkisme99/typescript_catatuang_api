@@ -7,7 +7,7 @@ export type SuccessResponse<T> = {
 export type ErrorResponse = {
   success: false;
   message: string;
-  errors?: Record<string, string[]> | null; // nullable, bisa null atau undefined
+  errors?: string | null; // nullable, bisa null atau undefined
 };
 
 export function successResponse<T>(
@@ -23,7 +23,7 @@ export function successResponse<T>(
 
 export function errorResponse(
   message: string,
-  errors: Record<string, string[]> | null = null
+  errors: string | null = null
 ): ErrorResponse {
   return {
     success: false,
