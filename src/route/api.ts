@@ -2,6 +2,7 @@ import express from "express";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { AuthenticationController } from "../controller/auth-controller";
 import { CategoryController } from "../controller/category-controller";
+import { validatedParamNumber } from "../middleware/valid-param-middleware";
 
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
@@ -13,3 +14,9 @@ apiRouter.delete("/api/auth/logout", AuthenticationController.logout);
 
 //category
 apiRouter.post("/api/categories", CategoryController.create);
+apiRouter.get(
+  "/api/categories/:categoryId",
+  validatedParamNumber("categoryId"),
+  CategoryController.get
+);
+// (\\\\d+) --> regex untuk number only

@@ -69,3 +69,77 @@ describe("POST /api/categories", () => {
     expect(response.body.data.type).toBe("income");
   });
 });
+
+describe("GET /api/categories", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+  });
+
+  afterEach(async () => {
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should reject get data if token wrong", async () => {
+    const category = await CategoryTest.get();
+    const response = await supertest(web)
+      .get(`/api/categories/${category.id}`)
+      .set({
+        "X-API-TOKEN": "salah",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject get data if param category not a number", async () => {
+    const contact = await CategoryTest.get();
+    const response = await supertest(web)
+      .get(`/api/categories/${contact.name}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject get data if category is not found", async () => {
+    const contact = await CategoryTest.get();
+    const response = await supertest(web)
+      .get(`/api/categories/${contact.id + 1}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should be able get data", async () => {
+    const contact = await CategoryTest.get();
+    const response = await supertest(web)
+      .get(`/api/categories/${contact.id}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.id).toBe(contact.id);
+    expect(response.body.data.name).toBe(contact.name);
+    expect(response.body.data.type).toBe(contact.type);
+  });
+});

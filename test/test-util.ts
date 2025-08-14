@@ -1,5 +1,6 @@
 import { prismaClient } from "../src/application/database";
 import bcrypt from "bcrypt";
+import { ResponseError } from "../src/error/response-error";
 
 export class UserTest {
   static async delete() {
@@ -40,5 +41,32 @@ export class CategoryTest {
         user_id: (await UserTest.get()).id,
       },
     });
+  }
+
+  static async create() {
+    const user = await UserTest.get();
+
+    const category = await prismaClient.category.create({
+      data: {
+        name: "Gaji Kantor",
+        type: "income",
+        user_id: user.id,
+      },
+    });
+
+    return category;
+  }
+
+  static async get() {
+    const user = await UserTest.get();
+    const category = await prismaClient.category.findFirst({
+      where: {
+        user_id: user.id,
+      },
+    });
+
+    if (!category) throw new ResponseError(404, "Category not found");
+
+    return category;
   }
 }

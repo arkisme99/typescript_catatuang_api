@@ -15,4 +15,15 @@ export class CategoryController {
       next(e);
     }
   }
+
+  static async get(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const categoryId = Number(req.params.categoryId);
+      const response = await CategoryService.get(req.user!, categoryId);
+
+      res.status(200).json(successResponse("Get Data Success", response));
+    } catch (e) {
+      next(e);
+    }
+  }
 }
