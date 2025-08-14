@@ -12,6 +12,7 @@
 
 ```json
 {
+  "id": 1, //Update API ini digunakan
   "name": "Gaji Kantor",
   "type": "income",
   "images": null
@@ -123,7 +124,7 @@
 
 ## Update Category
 
-#### Endpoint : PATCH `/api/categories/:id`
+#### Endpoint : PUT `/api/categories/:id`
 
 **Request Header :**
 
@@ -132,7 +133,7 @@
 **Request Body :**
 
 ```json
-// Request Body, Optional fields
+// Request Body
 ```
 
 **Success Response (200):**

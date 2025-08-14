@@ -4,6 +4,7 @@ import {
   CategoryResponse,
   CreateCategoryRequest,
   toCategoryResponse,
+  UpdateCategoryRequest,
 } from "../model/category-model";
 import { CategoryValidation } from "../validation/category-validation";
 import { Validation } from "../validation/validation";
@@ -32,7 +33,7 @@ export class CategoryService {
     return toCategoryResponse(category);
   }
 
-  static async get(user: User, id: number): Promise<CategoryResponse> {
+  static async mustCheckCategoryFirst(user: User, id: number) {
     const category = await prismaClient.category.findFirst({
       where: {
         id: id,
@@ -41,6 +42,35 @@ export class CategoryService {
     });
 
     if (!category) throw new ResponseError(404, "Category not found");
+
+    return category;
+  }
+
+  static async get(user: User, id: number): Promise<CategoryResponse> {
+    const category = await this.mustCheckCategoryFirst(user, id);
+    return toCategoryResponse(category);
+  }
+
+  static async update(
+    user: User,
+    request: UpdateCategoryRequest
+  ): Promise<CategoryResponse> {
+    const updateCategory = Validation.validate(
+      CategoryValidation.UPDATE,
+      request
+    );
+    await this.mustCheckCategoryFirst(user, updateCategory.id);
+
+    const category = await prismaClient.category.update({
+      where: {
+        id: updateCategory.id,
+        user_id: user.id,
+      },
+      data: {
+        name: updateCategory.name,
+        type: updateCategory.type,
+      },
+    });
 
     return toCategoryResponse(category);
   }

@@ -19,4 +19,8 @@ apiRouter.get(
   validatedParamNumber("categoryId"),
   CategoryController.get
 );
-// (\\\\d+) --> regex untuk number only
+apiRouter.put(
+  "/api/categories/:categoryId",
+  validatedParamNumber("categoryId"),
+  CategoryController.update
+);

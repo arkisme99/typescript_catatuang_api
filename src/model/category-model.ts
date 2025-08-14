@@ -16,6 +16,13 @@ export type CreateCategoryRequest = {
   images?: string;
 };
 
+export type UpdateCategoryRequest = {
+  id: number;
+  name: string;
+  type: string;
+  images?: string;
+};
+
 export function toCategoryResponse(category: Category): CategoryResponse {
   return {
     id: category.id,
