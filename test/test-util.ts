@@ -32,3 +32,13 @@ export class UserTest {
     return user;
   }
 }
+
+export class CategoryTest {
+  static async deleteAll() {
+    await prismaClient.category.deleteMany({
+      where: {
+        user_id: (await UserTest.get()).id,
+      },
+    });
+  }
+}

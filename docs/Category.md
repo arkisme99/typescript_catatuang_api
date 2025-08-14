@@ -8,6 +8,29 @@
 
 ---
 
+**Request Body:**
+
+```json
+{
+  "name": "Gaji Kantor",
+  "type": "income",
+  "images": null
+}
+```
+
+**Data Response:**
+
+```json
+{
+  "id": 1,
+  "name": "Gaji Kantor",
+  "type": "income",
+  "images": null,
+  "created_at": "2025-01-01 10:00:55",
+  "updated_at": "2025-01-01 10:00:55"
+}
+```
+
 **Error Response (4xx / 5xx):**
 
 ```json
@@ -34,16 +57,11 @@
 {
   "success": true,
   "message": "Get Data Success",
-  "data": {
-    "id": 2,
-    "name": "Gaji Kantor",
-    "type": "income",
-    "images": null
-  }
+  "data": {} // Data Response
 }
 ```
 
----
+- [Back To Top](#category-api-spec)
 
 ## Search Category
 
@@ -66,20 +84,7 @@
 {
   "success": true,
   "message": "Get Data Success",
-  "data": [
-    {
-      "id": 1,
-      "name": "Gaji Kantor",
-      "type": "income",
-      "images": null
-    },
-    {
-      "id": 2,
-      "name": "Tagihan Listrik",
-      "type": "expense",
-      "images": null
-    }
-  ],
+  "data": [], // Data Response
   "paging": {
     "current_page": 1,
     "total_page": 10,
@@ -88,7 +93,7 @@
 }
 ```
 
----
+- [Back To Top](#category-api-spec)
 
 ## Create Category
 
@@ -101,11 +106,7 @@
 **Request Body :**
 
 ```json
-{
-  "name": "Gaji Kantor",
-  "type": "income",
-  "images": null
-}
+// Request Body
 ```
 
 **Success Response (201):**
@@ -114,21 +115,15 @@
 {
   "success": true,
   "message": "Create Data Success",
-  "data": {
-    "id": 1,
-    "name": "Gaji Kantor",
-    "type": "income",
-    "images": null,
-    "user_id": 1
-  }
+  "data": {} // Data Response
 }
 ```
 
----
+- [Back To Top](#category-api-spec)
 
 ## Update Category
 
-#### Endpoint : PUT `/api/categories/:id`
+#### Endpoint : PATCH `/api/categories/:id`
 
 **Request Header :**
 
@@ -137,11 +132,7 @@
 **Request Body :**
 
 ```json
-{
-  "name": "Gaji Kantor",
-  "type": "income",
-  "images": null
-}
+// Request Body, Optional fields
 ```
 
 **Success Response (200):**
@@ -150,16 +141,11 @@
 {
   "success": true,
   "message": "Update Data Success",
-  "data": {
-    "id": 1,
-    "name": "Gaji Kantor",
-    "type": "income",
-    "images": null
-  }
+  "data": {} // Data Response
 }
 ```
 
----
+- [Back To Top](#category-api-spec)
 
 ## Delete Category
 
@@ -179,4 +165,4 @@
 }
 ```
 
----
+- [Back To Top](#category-api-spec)
