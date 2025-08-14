@@ -91,7 +91,8 @@
 ```json
 {
   "success": true,
-  "message": "Logout successful"
+  "message": "Logout successful",
+  "data": null
 }
 ```
 

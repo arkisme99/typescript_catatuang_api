@@ -212,3 +212,42 @@ describe("PATCH /api/auth/profile", () => {
     expect(await bcrypt.compare("passwordbaru", user.password)).toBe(true);
   });
 });
+
+describe("DELETE /api/auth/logout", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+
+  it("should be able logout success", async () => {
+    const response = await supertest(web).delete("/api/auth/logout").set({
+      "X-API-TOKEN": "test",
+    });
+
+    logger.debug(response.body);
+
+    const user = await UserTest.get();
+    expect(user.token).toBeNull();
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data).toBeNull();
+  });
+
+  it("should reject logout if token is wrong", async () => {
+    const response = await supertest(web).delete("/api/auth/logout").set({
+      "X-API-TOKEN": "salah",
+    });
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+});
