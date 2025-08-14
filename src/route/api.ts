@@ -24,3 +24,8 @@ apiRouter.put(
   validatedParamNumber("categoryId"),
   CategoryController.update
 );
+apiRouter.delete(
+  "/api/categories/:categoryId",
+  validatedParamNumber("categoryId"),
+  CategoryController.delete
+);

@@ -61,7 +61,7 @@ export class AuthenticationController {
 
   static async logout(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const response = await AuthService.logout(req.user!);
+      await AuthService.logout(req.user!);
       res.status(200).json(successResponse("Logout successful", null)); //data == null karena sudah logout tidak perlu tampil data lagi
     } catch (e) {
       next(e);

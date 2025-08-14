@@ -41,4 +41,16 @@ export class CategoryController {
       next(e);
     }
   }
+
+  static async delete(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      // const request: UpdateCategoryRequest = req.body as UpdateCategoryRequest;
+      const contactId = Number(req.params.categoryId);
+      await CategoryService.delete(req.user!, contactId);
+
+      res.status(200).json(successResponse("Update Data Success", null));
+    } catch (e) {
+      next(e);
+    }
+  }
 }

@@ -214,3 +214,45 @@ describe("PUT /api/categories", () => {
     expect(response.body.data.type).toBe("income edited");
   });
 });
+
+describe("DELETE /api/categories", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+  });
+
+  afterEach(async () => {
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should reject delete if token is wrong", async () => {
+    const contact = await CategoryTest.get();
+    const response = await supertest(web)
+      .delete(`/api/categories/${contact.id}`)
+      .set({
+        "X-API-TOKEN": "salah",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should be able delete data category", async () => {
+    const contact = await CategoryTest.get();
+    const response = await supertest(web)
+      .delete(`/api/categories/${contact.id}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data).toBeNull();
+  });
+});

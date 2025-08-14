@@ -74,4 +74,17 @@ export class CategoryService {
 
     return toCategoryResponse(category);
   }
+
+  static async delete(user: User, id: number): Promise<CategoryResponse> {
+    await this.mustCheckCategoryFirst(user, id);
+
+    const category = await prismaClient.category.delete({
+      where: {
+        id: id,
+        user_id: user.id,
+      },
+    });
+
+    return toCategoryResponse(category);
+  }
 }
