@@ -1,7 +1,14 @@
+export type Paging = {
+  current_page: number;
+  total_page: number;
+  size: number;
+};
+
 export type SuccessResponse<T> = {
   success: true;
   message: string;
   data: T;
+  paging?: Paging;
 };
 
 export type ErrorResponse = {
@@ -12,12 +19,14 @@ export type ErrorResponse = {
 
 export function successResponse<T>(
   message: string,
-  data: T
+  data: T,
+  paging?: Paging
 ): SuccessResponse<T> {
   return {
     success: true,
     message,
     data,
+    ...(paging && { paging }),
   };
 }
 
