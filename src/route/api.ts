@@ -19,6 +19,7 @@ apiRouter.get(
   validatedParamNumber("categoryId"),
   CategoryController.get
 );
+apiRouter.get("/api/categories", CategoryController.search);
 apiRouter.put(
   "/api/categories/:categoryId",
   validatedParamNumber("categoryId"),

@@ -3,6 +3,7 @@ import { prismaClient } from "../application/database";
 import {
   CategoryResponse,
   CreateCategoryRequest,
+  SearchCategoryRequest,
   toCategoryResponse,
   UpdateCategoryRequest,
 } from "../model/category-model";
@@ -10,6 +11,7 @@ import { CategoryValidation } from "../validation/category-validation";
 import { Validation } from "../validation/validation";
 import { ErrorResponse } from "../application/data-state";
 import { ResponseError } from "../error/response-error";
+import { Pageable } from "../model/page";
 
 export class CategoryService {
   static async create(
@@ -86,5 +88,59 @@ export class CategoryService {
     });
 
     return toCategoryResponse(category);
+  }
+
+  static async search(
+    user: User,
+    request: SearchCategoryRequest
+  ): Promise<Pageable<CategoryResponse>> {
+    const categoryRequest = Validation.validate(
+      CategoryValidation.SEARCH,
+      request
+    );
+    const skip = (categoryRequest.page - 1) * categoryRequest.size;
+
+    const filters = [];
+    //check if name exist
+    if (categoryRequest.name) {
+      filters.push({
+        name: {
+          contains: categoryRequest.name,
+        },
+      });
+    }
+    //check if type exist
+    if (categoryRequest.type) {
+      filters.push({
+        type: {
+          contains: categoryRequest.type,
+        },
+      });
+    }
+
+    const categories = await prismaClient.category.findMany({
+      where: {
+        user_id: user.id,
+        AND: filters,
+      },
+      take: categoryRequest.size,
+      skip: skip,
+    });
+
+    const total = await prismaClient.category.count({
+      where: {
+        user_id: user.id,
+        AND: filters,
+      },
+    });
+
+    return {
+      data: categories.map((category) => toCategoryResponse(category)),
+      paging: {
+        current_page: categoryRequest.page,
+        total_page: Math.ceil(total / categoryRequest.size),
+        size: categoryRequest.size,
+      },
+    };
   }
 }

@@ -23,6 +23,13 @@ export type UpdateCategoryRequest = {
   images?: string;
 };
 
+export type SearchCategoryRequest = {
+  name?: string;
+  type?: string;
+  page: number;
+  size: number;
+};
+
 export function toCategoryResponse(category: Category): CategoryResponse {
   return {
     id: category.id,

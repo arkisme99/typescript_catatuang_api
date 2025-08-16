@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   CreateCategoryRequest,
+  SearchCategoryRequest,
   UpdateCategoryRequest,
 } from "../model/category-model";
 import { CategoryService } from "../service/category-service";
@@ -49,6 +50,26 @@ export class CategoryController {
       await CategoryService.delete(req.user!, contactId);
 
       res.status(200).json(successResponse("Update Data Success", null));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async search(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const request: SearchCategoryRequest = {
+        name: req.query.name as string,
+        type: req.query.type as string,
+        page: req.query.page ? Number(req.query.page) : 1,
+        size: req.query.page ? Number(req.query.size) : 10,
+      };
+      const response = await CategoryService.search(req.user!, request);
+
+      res
+        .status(200)
+        .json(
+          successResponse("Get Data Success", response.data, response.paging)
+        );
     } catch (e) {
       next(e);
     }

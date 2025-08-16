@@ -256,3 +256,144 @@ describe("DELETE /api/categories", () => {
     expect(response.body.data).toBeNull();
   });
 });
+
+describe("Get /api/categories", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+  });
+  afterEach(async () => {
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should be able search data", async () => {
+    const response = await supertest(web).get(`/api/categories`).set({
+      "X-API-TOKEN": "test",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if name exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        name: "Kantor",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if type exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        type: "income",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if name and type exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        name: "Kantor",
+        type: "income",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able to search category no result", async () => {
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        name: "salah",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(0);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(0);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able to search category with paging", async () => {
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        page: 2,
+        size: 1,
+      });
+
+    logger.debug("di sini");
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(0);
+    expect(response.body.paging.current_page).toBe(2);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(1);
+  });
+
+  it("should reject if token is wrong", async () => {
+    const response = await supertest(web).get(`/api/categories`).set({
+      "X-API-TOKEN": "salah",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+});
