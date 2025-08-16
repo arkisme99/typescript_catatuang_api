@@ -70,3 +70,13 @@ export class CategoryTest {
     return category;
   }
 }
+
+export class TransactionTest {
+  static async deleteAll() {
+    await prismaClient.transaction.deleteMany({
+      where: {
+        user_id: (await UserTest.get()).id,
+      },
+    });
+  }
+}

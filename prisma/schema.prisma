@@ -46,7 +46,7 @@ model Category {
 
 model Transaction {
   id               Int       @id @default(autoincrement())
-  transaction_date DateTime  @db.Date
+  transaction_date DateTime  @db.Timestamp(0)
   month            Int       @db.TinyInt
   year             Int       @db.Year
   description      String    @db.Text

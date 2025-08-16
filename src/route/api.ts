@@ -3,6 +3,7 @@ import { authMiddleware } from "../middleware/auth-middleware";
 import { AuthenticationController } from "../controller/auth-controller";
 import { CategoryController } from "../controller/category-controller";
 import { validatedParamNumber } from "../middleware/valid-param-middleware";
+import { TransactionController } from "../controller/transaction-controller";
 
 export const apiRouter = express.Router();
 apiRouter.use(authMiddleware);
@@ -30,3 +31,6 @@ apiRouter.delete(
   validatedParamNumber("categoryId"),
   CategoryController.delete
 );
+
+//transaction
+apiRouter.post("/api/transactions", TransactionController.create);

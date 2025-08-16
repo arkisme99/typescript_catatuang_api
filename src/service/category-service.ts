@@ -9,7 +9,6 @@ import {
 } from "../model/category-model";
 import { CategoryValidation } from "../validation/category-validation";
 import { Validation } from "../validation/validation";
-import { ErrorResponse } from "../application/data-state";
 import { ResponseError } from "../error/response-error";
 import { Pageable } from "../model/page";
 

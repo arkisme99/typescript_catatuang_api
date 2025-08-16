@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE `transactions` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `transaction_date` DATE NOT NULL,
+    `transaction_date` TIMESTAMP(0) NOT NULL,
     `month` TINYINT NOT NULL,
     `year` YEAR NOT NULL,
     `description` TEXT NOT NULL,
