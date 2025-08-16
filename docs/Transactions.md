@@ -1,12 +1,41 @@
 # Transactions API Spec
 
-- [Get Transaction](#get-transaction)
-- [Search Transaction](#search-transaction)
-- [Create Transaction](#create-transaction)
-- [Update Transaction](#update-transaction)
-- [Delete Transaction](#delete-transaction)
+- [Get Transactions](#get-transactions)
+- [Search Transactions](#search-transactions)
+- [Create Transactions](#create-transactions)
+- [Update Transactions](#update-transactions)
+- [Delete Transactions](#delete-transactions)
 
 ---
+
+**Request Body:**
+
+```json
+{
+  "transaction_date": "2025-07-29",
+  "category_id": 1,
+  "user_id": 1,
+  "description": "Gaji Bulan Juli 2025",
+  "amount": 25000000,
+  "type": "income"
+}
+```
+
+**Data Response:**
+
+```json
+{
+  "id": 2,
+  "transaction_date": "2025-07-29",
+  "category_id": 1,
+  "user_id": 1,
+  "description": "Gaji Bulan Juli 2025",
+  "amount": 25000000,
+  "type": "income",
+  "created_at": "2025-01-01",
+  "updated_at": "2025-01-01"
+}
+```
 
 **Error Response (4xx / 5xx):**
 
@@ -34,18 +63,11 @@
 {
   "success": true,
   "message": "Get Data Success",
-  "data": {
-    "id": 2,
-    "transaction_date": "2025-07-29",
-    "category_id": 1,
-    "description": "Gaji Bulan Juli 2025",
-    "amount": 25000000,
-    "type": "income"
-  }
+  "data": {} // Data response
 }
 ```
 
----
+- [Back To Top](#transactions-api-spec)
 
 ## Search Transactions
 
@@ -70,24 +92,7 @@
 {
   "success": true,
   "message": "Get Data Success",
-  "data": [
-    {
-      "id": 2,
-      "transaction_date": "2025-07-29",
-      "category_id": 1,
-      "description": "Gaji Bulan Juli 2025",
-      "amount": 25000000,
-      "type": "income"
-    },
-    {
-      "id": 3,
-      "transaction_date": "2025-07-30",
-      "category_id": 2,
-      "description": "Token Listrik Bulan Agustus 2025",
-      "amount": 350000,
-      "type": "expense"
-    }
-  ],
+  "data": [], // Data Response
   "paging": {
     "current_page": 1,
     "total_page": 10,
@@ -96,7 +101,7 @@
 }
 ```
 
----
+- [Back To Top](#transactions-api-spec)
 
 ## Create Transactions
 
@@ -109,14 +114,7 @@
 **Request Body :**
 
 ```json
-{
-  "transaction_date": "2025-07-29",
-  "category_id": 1,
-  "description": "Gaji Bulan Juli 2025",
-  "amount": 25000000,
-  "type": "income",
-  "user_id": 1
-}
+// Request Body
 ```
 
 **Success Response (201):**
@@ -125,18 +123,11 @@
 {
   "success": true,
   "message": "Create Data Success",
-  "data": {
-    "id": 2,
-    "transaction_date": "2025-07-29",
-    "category_id": 1,
-    "description": "Gaji Bulan Juli 2025",
-    "amount": 25000000,
-    "type": "income"
-  }
+  "data": {} // Data Response
 }
 ```
 
----
+- [Back To Top](#transactions-api-spec)
 
 ## Update Transactions
 
@@ -149,13 +140,7 @@
 **Request Body :**
 
 ```json
-{
-  "transaction_date": "2025-07-29",
-  "category_id": 1,
-  "description": "Gaji Bulan Juli 2025",
-  "amount": 25000000,
-  "type": "income"
-}
+// Request Body
 ```
 
 **Success Response (200):**
@@ -164,18 +149,11 @@
 {
   "success": true,
   "message": "Update Data Success",
-  "data": {
-    "id": 2,
-    "transaction_date": "2025-07-29",
-    "category_id": 1,
-    "description": "Gaji Bulan Juli 2025",
-    "amount": 25000000,
-    "type": "income"
-  }
+  "data": {} // Data Response
 }
 ```
 
----
+- [Back To Top](#transactions-api-spec)
 
 ## Delete Transactions
 
@@ -195,4 +173,4 @@
 }
 ```
 
----
+- [Back To Top](#transactions-api-spec)
