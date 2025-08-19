@@ -25,6 +25,19 @@ export class TransactionService {
     return category;
   }
 
+  static async mustCheckTransactionFirst(user: User, id: number) {
+    const transaction = await prismaClient.transaction.findFirst({
+      where: {
+        id: id,
+        user_id: user.id,
+      },
+    });
+
+    if (!transaction) throw new ResponseError(404, "Transaction not found");
+
+    return transaction;
+  }
+
   static async create(
     user: User,
     request: CreateTransactionRequest
@@ -53,6 +66,11 @@ export class TransactionService {
       data: newData,
     });
 
+    return toTransactionResponse(transaction);
+  }
+
+  static async get(user: User, id: number): Promise<TransactionResponse> {
+    const transaction = await this.mustCheckTransactionFirst(user, id);
     return toTransactionResponse(transaction);
   }
 }

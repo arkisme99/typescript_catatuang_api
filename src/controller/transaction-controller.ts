@@ -16,4 +16,15 @@ export class TransactionController {
       next(e);
     }
   }
+
+  static async get(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const transactionId = Number(req.params.transactionId);
+      const response = await TransactionService.get(req.user!, transactionId);
+
+      res.status(200).json(successResponse("Get Data Success", response));
+    } catch (e) {
+      next(e);
+    }
+  }
 }

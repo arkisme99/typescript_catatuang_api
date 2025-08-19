@@ -34,3 +34,8 @@ apiRouter.delete(
 
 //transaction
 apiRouter.post("/api/transactions", TransactionController.create);
+apiRouter.get(
+  "/api/transactions/:transactionId",
+  validatedParamNumber("transactionId"),
+  TransactionController.get
+);

@@ -127,3 +127,89 @@ describe("POST /api/transactions", () => {
     expect(response.body.errors).toBeNull();
   });
 });
+
+describe("GET /api/transactions", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+    await TransactionTest.create();
+  });
+
+  afterEach(async () => {
+    await TransactionTest.deleteAll();
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should reject get data if token wrong", async () => {
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .get(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "salah",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject get data if param transaction not a number", async () => {
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .get(`/api/transactions/${transaction.transaction_date}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject get data if transaction is not found", async () => {
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .get(`/api/transactions/${transaction.id + 1}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should be able get data", async () => {
+    const transaction = await TransactionTest.get();
+    const user = await UserTest.get();
+    const category = await CategoryTest.get();
+
+    const response = await supertest(web)
+      .get(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(
+      formatDateString(response.body.data.transaction_date, "yyyy-MM-dd")
+    ).toBe("2025-07-29");
+    expect(response.body.data.user_id).toBe(user.id);
+    expect(response.body.data.category_id).toBe(category.id);
+    expect(response.body.data.description).toBe("Gaji Bulan Juli 2025");
+    expect(response.body.data.month).toBe(7);
+    expect(response.body.data.year).toBe(2025);
+    expect(response.body.data.amount).toBe("15955650.35");
+    expect(response.body.data.type).toBe(category.type);
+  });
+});
