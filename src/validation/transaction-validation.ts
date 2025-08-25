@@ -33,4 +33,14 @@ export class TransactionValidation {
     year: z.number(),
     amount: decimalAsString,
   });
+
+  static readonly UPDATE: ZodType = z.object({
+    id: z.number(),
+    transaction_date: dateFromString,
+    category_id: z.number(),
+    description: z.string().min(1).max(255),
+    month: z.number(),
+    year: z.number(),
+    amount: decimalAsString,
+  });
 }

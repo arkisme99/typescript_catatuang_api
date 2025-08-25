@@ -35,6 +35,8 @@ npx prisma migrate dev
 
 npx prisma generate
 
+npm run test
+
 npm run build
 
 npm run start

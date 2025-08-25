@@ -3,6 +3,7 @@ import {
   CreateTransactionRequest,
   toTransactionResponse,
   TransactionResponse,
+  UpdateTransactionRequest,
 } from "../model/transaction-model";
 import { Validation } from "../validation/validation";
 import { TransactionValidation } from "../validation/transaction-validation";
@@ -52,10 +53,6 @@ export class TransactionService {
       request
     );
 
-    logger.debug(
-      `check request validated : ${JSON.stringify(transactionRequest)}`
-    );
-
     const newData = {
       ...transactionRequest,
       user_id: user.id,
@@ -71,6 +68,40 @@ export class TransactionService {
 
   static async get(user: User, id: number): Promise<TransactionResponse> {
     const transaction = await this.mustCheckTransactionFirst(user, id);
+    return toTransactionResponse(transaction);
+  }
+
+  static async update(
+    user: User,
+    request: UpdateTransactionRequest
+  ): Promise<TransactionResponse> {
+    const transactionRequest = Validation.validate(
+      TransactionValidation.UPDATE,
+      request
+    );
+
+    await this.mustCheckTransactionFirst(user, transactionRequest.id);
+    const category = await this.mustCheckCategoryFirst(
+      user,
+      transactionRequest.category_id
+    );
+
+    const transaction = await prismaClient.transaction.update({
+      where: {
+        id: transactionRequest.id,
+        user_id: user.id,
+      },
+      data: {
+        transaction_date: transactionRequest.transaction_date,
+        category_id: transactionRequest.category_id,
+        description: transactionRequest.description,
+        month: transactionRequest.month,
+        year: transactionRequest.year,
+        amount: transactionRequest.amount,
+        type: category.type,
+      },
+    });
+
     return toTransactionResponse(transaction);
   }
 }

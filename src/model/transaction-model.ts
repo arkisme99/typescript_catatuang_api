@@ -25,6 +25,16 @@ export type CreateTransactionRequest = {
   amount: Decimal;
 };
 
+export type UpdateTransactionRequest = {
+  id: number;
+  transaction_date: string;
+  category_id: number;
+  description: string;
+  month: number;
+  year: number;
+  amount: Decimal;
+};
+
 export function toTransactionResponse(
   transaction: Transaction
 ): TransactionResponse {

@@ -1,6 +1,9 @@
 import { NextFunction, Response } from "express";
 import { UserRequest } from "../type/user-request";
-import { CreateTransactionRequest } from "../model/transaction-model";
+import {
+  CreateTransactionRequest,
+  UpdateTransactionRequest,
+} from "../model/transaction-model";
 import { TransactionService } from "../service/transaction-service";
 import { successResponse } from "../application/data-state";
 
@@ -23,6 +26,19 @@ export class TransactionController {
       const response = await TransactionService.get(req.user!, transactionId);
 
       res.status(200).json(successResponse("Get Data Success", response));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async update(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const request: UpdateTransactionRequest =
+        req.body as UpdateTransactionRequest;
+      request.id = Number(req.params.transactionId);
+      const response = await TransactionService.update(req.user!, request);
+
+      res.status(200).json(successResponse("Update Data Success", response));
     } catch (e) {
       next(e);
     }

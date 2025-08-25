@@ -2,7 +2,7 @@ import supertest from "supertest";
 import { CategoryTest, TransactionTest, UserTest } from "./test-util";
 import { web } from "../src/application/web";
 import { logger } from "../src/application/logging";
-import { formatDateString } from "../src/helpers/date-helper";
+import { formatDateString, stringToDate } from "../src/helpers/date-helper";
 describe("POST /api/transactions", () => {
   beforeEach(async () => {
     await UserTest.create();
@@ -211,5 +211,89 @@ describe("GET /api/transactions", () => {
     expect(response.body.data.year).toBe(2025);
     expect(response.body.data.amount).toBe("15955650.35");
     expect(response.body.data.type).toBe(category.type);
+  });
+});
+
+describe("PUT /api/transactions", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+    await TransactionTest.create();
+  });
+
+  afterEach(async () => {
+    await TransactionTest.deleteAll();
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should reject update if token is wrong", async () => {
+    // const category = await CategoryTest.get();
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .put(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "salah",
+      })
+      .send({
+        description: "Gaji Bulan Juli 2025 edited",
+        amount: 17500000,
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject update if request is invalid", async () => {
+    const category = await CategoryTest.get();
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .put(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .send({
+        description: "",
+        month: "6",
+        amount: 17500000,
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should be able update data transactions", async () => {
+    const transaction = await TransactionTest.get();
+    const user = await UserTest.get();
+    const category = await CategoryTest.get();
+    const response = await supertest(web)
+      .put(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .send({
+        transaction_date: "2025-07-29",
+        category_id: category.id,
+        user_id: user.id,
+        description: "Gaji Bulan Juli 2025 edited",
+        month: 7,
+        year: 2025,
+        amount: 17500000,
+        type: category.type,
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.id).toBe(transaction.id);
+    expect(response.body.data.description).toBe("Gaji Bulan Juli 2025 edited");
+    expect(response.body.data.amount).toBe("17500000");
   });
 });
