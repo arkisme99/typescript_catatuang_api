@@ -297,3 +297,209 @@ describe("PUT /api/transactions", () => {
     expect(response.body.data.amount).toBe("17500000");
   });
 });
+
+describe("DELETE /api/transactions", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+    await TransactionTest.create();
+  });
+
+  afterEach(async () => {
+    await TransactionTest.deleteAll();
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should reject delete if token is wrong", async () => {
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .delete(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "salah",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should be able delete data Transaction", async () => {
+    const transaction = await TransactionTest.get();
+    const response = await supertest(web)
+      .delete(`/api/transactions/${transaction.id}`)
+      .set({
+        "X-API-TOKEN": "test",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data).toBeNull();
+  });
+});
+
+describe("Get /api/transactions", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await CategoryTest.create();
+    await TransactionTest.create();
+  });
+  afterEach(async () => {
+    await TransactionTest.deleteAll();
+    await CategoryTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should be able search data transaction", async () => {
+    const response = await supertest(web).get(`/api/transactions`).set({
+      "X-API-TOKEN": "test",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if transaction_date exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        transaction_date: "2025-07-29",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if description exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        description: "Gaji Bulan Juli 2025",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if amount exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        amount: 15955650.35,
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able search data if month and year exist", async () => {
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        month: 7,
+        year: 2025,
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able to search transaction no result", async () => {
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        description: "salah",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(0);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(0);
+    expect(response.body.paging.size).toBe(10);
+  });
+
+  it("should be able to search transaction with paging", async () => {
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set({
+        "X-API-TOKEN": "test",
+      })
+      .query({
+        page: 2,
+        size: 1,
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBeDefined();
+    expect(response.body.data.length).toBe(0);
+    expect(response.body.paging.current_page).toBe(2);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(1);
+  });
+
+  it("should reject if token is wrong", async () => {
+    const response = await supertest(web).get(`/api/transactions`).set({
+      "X-API-TOKEN": "salah",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized");
+    expect(response.body.errors).toBeNull();
+  });
+});

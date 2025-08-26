@@ -39,14 +39,14 @@ apiRouter.get(
   validatedParamNumber("transactionId"),
   TransactionController.get
 );
-// apiRouter.get("/api/transactions", TransactionController.search);
+apiRouter.get("/api/transactions", TransactionController.search);
 apiRouter.put(
   "/api/transactions/:transactionId",
   validatedParamNumber("transactionId"),
   TransactionController.update
 );
-// apiRouter.delete(
-//   "/api/transactions/:transactionId",
-//   validatedParamNumber("transactionId"),
-//   TransactionController.delete
-// );
+apiRouter.delete(
+  "/api/transactions/:transactionId",
+  validatedParamNumber("transactionId"),
+  TransactionController.delete
+);

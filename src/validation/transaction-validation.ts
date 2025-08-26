@@ -43,4 +43,16 @@ export class TransactionValidation {
     year: z.number(),
     amount: decimalAsString,
   });
+
+  static readonly SEARCH: ZodType = z.object({
+    transaction_date: dateFromString.optional(),
+    // transaction_date: z.string().min(1).optional(),
+    // category_id: z.number().optional(),
+    description: z.string().min(1).max(255).optional(),
+    month: z.number().optional(),
+    year: z.number().optional(),
+    amount: decimalAsString.optional(),
+    page: z.number().optional(),
+    size: z.number().optional(),
+  });
 }

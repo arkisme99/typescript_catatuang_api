@@ -35,6 +35,16 @@ export type UpdateTransactionRequest = {
   amount: Decimal;
 };
 
+export type SearchTransactionRequest = {
+  transaction_date?: string;
+  description?: string;
+  month?: number;
+  year?: number;
+  amount?: Decimal | number;
+  page: number;
+  size: number;
+};
+
 export function toTransactionResponse(
   transaction: Transaction
 ): TransactionResponse {
