@@ -19,6 +19,7 @@
   "dependencies": {
     "@prisma/client": "^6.13.0",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "express": "^5.1.0",
@@ -31,6 +32,7 @@
     "@babel/preset-typescript": "^7.27.1",
     "@jest/globals": "^30.0.5",
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/supertest": "^6.0.3",
