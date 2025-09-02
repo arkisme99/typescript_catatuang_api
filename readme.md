@@ -1,28 +1,44 @@
 # Catat Uang API
 
-Aplikasi nodejs - typescript, dengan pattern MVC + Service Pattern
+**Aplikasi RESTful API berbasis Node.js & TypeScript**  
+Menggunakan pola arsitektur **MVC** dan **Service Pattern**
 
-## 1. Overview
+---
 
-Aplikasi Catat Keuangan Harian menyediakan API untuk:
+## 1. Deskripsi Singkat
 
-- Authentication API (Register, Login, Logout, Profile)
-- Manajemen User (Create, Get, Search, Update, Delete)
-- Pencatatan Keuangan Harian (Create, Get, Search, Update, Delete)
-- Laporan Keuangan (Summary Reports By Period Date)
+Aplikasi ini menyediakan API untuk **mencatat transaksi keuangan harian**, termasuk registrasi & autentikasi pengguna, manajemen kategori, manajemen transaksi, dan laporan keuangan berbasis periode.
 
-## Silahkan lihat API Spec di Folder **./docs**
+---
 
-## 2. Authentication
+## 2. Fitur Utama
 
-Autentikasi menggunakan **Token**.  
-Endpoint yang membutuhkan autentikasi harus menambahkan header:
+- **Autentikasi**
+  - Register / Login / Logout / Profile
+- **Manajemen Kategori**
+  - Create, Read, Update, Delete, serta pencarian kategori
+- **Pencatatan Keuangan**
+  - Create, Read, Update, Delete, serta pencarian transaksi
+- **Laporan Keuangan**
+  - Ringkasan laporan berdasarkan periode tanggal
 
-```
-Authorization: <token>
-```
+---
 
-## 3. Installation & Running
+## 3. Spesifikasi API
+
+Dokumen spesifikasi API lengkap tersedia di folder `./docs`.
+
+---
+
+## 4. Instalasi & Setup
+
+**Clone repository:**
+   ```bash
+   git clone https://github.com/arkisme99/typescript_catatuang_api.git
+   cd typescript_catatuang_api
+   ```
+
+**Installation & Running:**
 
 - Copy .env.example Menjadi .env
 - Setup Database di .env
@@ -41,3 +57,10 @@ npm run build
 
 npm run start
 ```
+
+## 5. Teknologi Yang Digunakan
+- Node.js & TypeScript
+- Express.js (jika digunakan, tuliskan)
+- Prisma untuk ORM
+- Jest atau framework testing lainnya
+- Pattern arsitektur: MVC + Service Layer
