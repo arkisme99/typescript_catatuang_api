@@ -33,10 +33,11 @@ Dokumen spesifikasi API lengkap tersedia di folder `./docs`.
 ## 4. Instalasi & Setup
 
 **Clone repository:**
-   ```bash
-   git clone https://github.com/arkisme99/typescript_catatuang_api.git
-   cd typescript_catatuang_api
-   ```
+
+```bash
+git clone https://github.com/arkisme99/typescript_catatuang_api.git
+cd typescript_catatuang_api
+```
 
 **Installation & Running:**
 
@@ -59,8 +60,10 @@ npm run start
 ```
 
 ## 5. Teknologi Yang Digunakan
+
 - Node.js & TypeScript
 - Express.js (jika digunakan, tuliskan)
 - Prisma untuk ORM
 - Jest atau framework testing lainnya
 - Pattern arsitektur: MVC + Service Layer
+- Implementasi rate limiter di login & register

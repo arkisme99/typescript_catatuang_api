@@ -9,7 +9,7 @@
     // "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "commonjs",
+    "module": "node16",
     "target": "es2016",
     "types": [],
     // For nodejs:
@@ -38,7 +38,7 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "outDir": "./dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true

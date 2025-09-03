@@ -38,6 +38,31 @@ describe("POST /api/auth/register", () => {
     expect(response.body.data.username).toBe("test");
     expect(response.body.data.name).toBe("Test Doe");
   });
+
+  it("should block requests after exceeding the limit", async () => {
+    // lakukan 3 request (limit = 3)
+    for (let i = 0; i < 3; i++) {
+      await supertest(web).post("/api/auth/register").send({
+        username: "test",
+        name: "Test Doe",
+        password: "secret123",
+      });
+
+      await UserTest.delete();
+    }
+
+    // request ke-4 harus ditolak
+    const response = await supertest(web).post("/api/auth/register").send({
+      username: "test",
+      name: "Test Doe",
+      password: "secret123",
+    });
+    expect(response.status).toBe(429);
+    expect(response.body).toHaveProperty(
+      "error",
+      "Terlalu banyak percobaan register. Coba lagi setelah 1 jam."
+    );
+  });
 });
 
 describe("POST /api/auth/login", () => {
@@ -88,6 +113,29 @@ describe("POST /api/auth/login", () => {
     expect(response.body.data.username).toBe("test");
     expect(response.body.data.name).toBe("Test Doe");
     expect(response.body.data.token).toBeDefined();
+  });
+
+  it("should block requests after exceeding the limit", async () => {
+    // lakukan 3 request (limit = 3)
+    for (let i = 0; i < 3; i++) {
+      await supertest(web).post("/api/auth/login").send({
+        username: "test",
+        password: "test",
+      });
+
+      await UserTest.delete();
+    }
+
+    // request ke-4 harus ditolak
+    const response = await supertest(web).post("/api/auth/login").send({
+      username: "test",
+      password: "test",
+    });
+    expect(response.status).toBe(429);
+    expect(response.body).toHaveProperty(
+      "error",
+      "Terlalu banyak percobaan login. Coba lagi setelah 15 menit."
+    );
   });
 });
 
