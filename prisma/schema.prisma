@@ -14,17 +14,18 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  username    String        @unique @db.VarChar(100)
-  name        String        @db.VarChar(150)
-  password    String        @db.VarChar(150)
-  email       String?       @db.VarChar(100)
-  token       String?       @db.VarChar(100)
-  avatar      String?       @db.VarChar(150)
-  created_at  DateTime?     @default(now()) @db.Timestamp(0)
-  updated_at  DateTime?     @updatedAt @db.Timestamp(0)
-  Category    Category[]
-  Transaction Transaction[]
+  id           Int            @id @default(autoincrement())
+  username     String         @unique @db.VarChar(100)
+  name         String         @db.VarChar(150)
+  password     String         @db.VarChar(150)
+  email        String?        @db.VarChar(100)
+  token        String?        @db.VarChar(100)
+  avatar       String?        @db.VarChar(150)
+  created_at   DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at   DateTime?      @updatedAt @db.Timestamp(0)
+  Category     Category[]
+  Transaction  Transaction[]
+  RefreshToken RefreshToken[]
 
   @@map("users")
 }
@@ -61,4 +62,21 @@ model Transaction {
   user     User     @relation(fields: [user_id], references: [id])
 
   @@map("transactions")
+}
+
+model RefreshToken {
+  id         Int       @id @default(autoincrement())
+  token      String    @db.VarChar(512) // simpan refresh token JWT
+  user_id    Int       @db.Int
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  deviceInfo String?   @db.VarChar(255) // optional: simpan info device
+  ipAddress  String?   @db.VarChar(45) // optional: IPv6 max 45 char
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([token])
+  @@map("refresh_tokens")
 }
