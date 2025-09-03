@@ -7,7 +7,7 @@ export type UserResponse = {
   name: string;
   email: string | null;
   avatar: string | null;
-  token?: string; //bisa tidak tampil
+  token?: string; //bisa tidak tampil, ini digunakan untuk menampilkan refreshToken
   created_at: string | null;
   updated_at: string | null;
 };
@@ -43,3 +43,9 @@ export function toUserResponse(user: User): UserResponse {
     updated_at: user.updated_at ? dateToString(user.updated_at) : null,
   };
 }
+
+export type JwtPayload = {
+  id: number;
+  username: string;
+  name: string;
+};

@@ -25,7 +25,8 @@ export class AuthenticationController {
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
       const request = req.body as LoginUserRequest;
-      const response = await AuthService.login(request);
+      const fullRequest = req;
+      const response = await AuthService.login(request, fullRequest, res);
 
       res
         .status(200)
@@ -61,7 +62,8 @@ export class AuthenticationController {
 
   static async logout(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      await AuthService.logout(req.user!);
+      const fullRequest = req;
+      await AuthService.logout(req.user!, fullRequest, res);
       res.status(200).json(successResponse("Logout successful", null)); //data == null karena sudah logout tidak perlu tampil data lagi
     } catch (e) {
       next(e);

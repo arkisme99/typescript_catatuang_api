@@ -66,7 +66,7 @@ model Transaction {
 
 model RefreshToken {
   id         Int       @id @default(autoincrement())
-  token      String    @db.VarChar(512) // simpan refresh token JWT
+  token      String    @unique @db.VarChar(512) // simpan refresh token JWT
   user_id    Int       @db.Int
   createdAt  DateTime  @default(now())
   expiresAt  DateTime

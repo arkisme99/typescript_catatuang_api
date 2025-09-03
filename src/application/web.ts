@@ -4,6 +4,7 @@ import { errorMiddleware } from "../middleware/error-middleware";
 import { apiRouter } from "../route/api";
 import cors from "cors";
 export const web = express();
+
 web.use(cors());
 web.use(express.json());
 web.use(publicRouter);

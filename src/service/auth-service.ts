@@ -11,7 +11,13 @@ import {
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
 import bcrypt from "bcrypt";
-import { v4 as uuid } from "uuid";
+import jwt from "jsonwebtoken";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../helpers/jwt-helper";
+import { Request, Response } from "express";
+import { ENV } from "../helpers/env";
 
 export class AuthService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -39,7 +45,11 @@ export class AuthService {
     return toUserResponse(user);
   }
 
-  static async login(request: LoginUserRequest): Promise<UserResponse> {
+  static async login(
+    request: LoginUserRequest,
+    fullRequest: Request,
+    res: Response
+  ): Promise<UserResponse> {
     const loginRequest = Validation.validate(UserValidation.LOGIN, request);
 
     let user = await prismaClient.user.findUnique({
@@ -61,17 +71,38 @@ export class AuthService {
       throw new ResponseError(401, "Username or password is wrong");
     }
 
-    user = await prismaClient.user.update({
+    /* user = await prismaClient.user.update({
       where: {
         username: loginRequest.username,
       },
       data: {
         token: uuid(),
       },
-    });
+    }); */
 
     const response = toUserResponse(user);
-    response.token = user.token!;
+    // response.token = user.token!;
+
+    const accessToken = await generateAccessToken(user);
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // expire 7 hari
+    const refreshToken = await generateRefreshToken(
+      user.id,
+      user.username,
+      expiresAt,
+      fullRequest.headers["user-agent"],
+      fullRequest.ip
+    );
+
+    response.token = accessToken!;
+
+    // simpan refreshToken di cookie httpOnly
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true, // aktifkan true kalau pakai https
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+    });
 
     return response;
   }
@@ -112,16 +143,66 @@ export class AuthService {
     return toUserResponse(updateUser);
   }
 
-  static async logout(user: User): Promise<UserResponse> {
-    const result = await prismaClient.user.update({
+  static async logout(
+    user: User,
+    fullRequest: Request,
+    res: Response
+  ): Promise<UserResponse> {
+    /* const result = await prismaClient.user.update({
       where: {
         username: user.username,
       },
       data: {
         token: null,
       },
+    }); */
+
+    const refreshToken = fullRequest.cookies.refreshToken;
+    //revoke token
+    await prismaClient.refreshToken.update({
+      where: { token: refreshToken },
+      data: { revokedAt: new Date() },
     });
 
-    return toUserResponse(result);
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+    res.sendStatus(204);
+
+    return toUserResponse(user);
+  }
+
+  static async refresh(
+    user: User,
+    fullRequest: Request,
+    res: Response
+  ): Promise<UserResponse> {
+    const refreshToken = fullRequest.cookies.refreshToken;
+    if (!refreshToken) throw new ResponseError(401, "Refresh token not found");
+
+    // cek token ada di DB
+    const tokenRecord = await prismaClient.refreshToken.findUnique({
+      where: { token: refreshToken },
+    });
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+      throw new ResponseError(403, "Refresh token is invalid");
+    }
+
+    // verifikasi JWT
+    let accessToken = "";
+    jwt.verify(
+      refreshToken,
+      ENV.JWT_REFRESH_SECRET,
+      async (err: any, user: any) => {
+        if (err) throw new ResponseError(403, "Refresh token is invalid");
+        accessToken = await generateAccessToken(user);
+      }
+    );
+
+    const response = toUserResponse(user);
+    response.token = accessToken!;
+    return response;
   }
 }
