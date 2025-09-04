@@ -2,6 +2,8 @@ import { prismaClient } from "../src/application/database";
 import bcrypt from "bcrypt";
 import { ResponseError } from "../src/error/response-error";
 import { stringToDate } from "../src/helpers/date-helper";
+import request from "supertest";
+import { web } from "../src/application/web";
 
 export class UserTest {
   static async delete() {
@@ -18,7 +20,7 @@ export class UserTest {
         username: "test",
         name: "Test Doe",
         password: await bcrypt.hash("test", 10),
-        token: "test", //token dihardcode untuk keperluan testing
+        // token: "test", //token dihardcode untuk keperluan testing
       },
     });
   }
@@ -32,6 +34,38 @@ export class UserTest {
 
     if (!user) throw new Error("User not found");
     return user;
+  }
+
+  static async login() {
+    // let refreshCookie: string | undefined;
+    const res = await request(web).post("/api/auth/login").send({
+      username: "test",
+      password: "test",
+    });
+
+    console.debug(`Testing: ${JSON.stringify(res.body)}`);
+
+    if (res.status !== 200 || !res.body.data.token) {
+      throw new Error("Login failed in test helper");
+    }
+
+    // const cookies = res.headers["set-cookie"] as unknown as string[];
+    // refreshCookie = cookies?.find((c) => c.startsWith("refreshToken="));
+
+    // return res.body.data.token as string;
+    return res;
+  }
+
+  static async getToken(resLogin: any) {
+    return resLogin.body.data.token as string;
+  }
+
+  static async getRefreshToken(resLogin: any) {
+    const cookies = resLogin.headers["set-cookie"] as unknown as string[];
+    /* console.debug(
+      `getRefreshToken: ${cookies?.find((c) => c.startsWith("refreshToken="))}`
+    ); */
+    return cookies?.find((c) => c.startsWith("refreshToken="));
   }
 }
 
@@ -112,5 +146,15 @@ export class TransactionTest {
     if (!transaction) throw new ResponseError(404, "Transaction not found");
 
     return transaction;
+  }
+}
+
+export class RefreshTokenTest {
+  static async deleteAll() {
+    await prismaClient.refreshToken.deleteMany({
+      where: {
+        user_id: (await UserTest.get()).id,
+      },
+    });
   }
 }

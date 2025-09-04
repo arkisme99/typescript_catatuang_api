@@ -5,11 +5,9 @@ import { prismaClient } from "../application/database";
 
 // buat Access Token
 export async function generateAccessToken(user: JwtPayload) {
-  return jwt.sign(
-    { id: user.id, username: user.username, name: user.name },
-    ENV.JWT_SECRET,
-    { expiresIn: "15m" }
-  );
+  return jwt.sign({ id: user.id, username: user.username }, ENV.JWT_SECRET, {
+    expiresIn: "15m",
+  });
 }
 
 // buat Refresh Token

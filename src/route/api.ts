@@ -1,17 +1,20 @@
 import express from "express";
-import { authMiddleware } from "../middleware/auth-middleware";
+// import { authMiddleware } from "../middleware/auth-middleware";
 import { AuthenticationController } from "../controller/auth-controller";
 import { CategoryController } from "../controller/category-controller";
 import { validatedParamNumber } from "../middleware/valid-param-middleware";
 import { TransactionController } from "../controller/transaction-controller";
+import { authenticateJwtToken } from "../middleware/authjwt-middleware";
 
 export const apiRouter = express.Router();
-apiRouter.use(authMiddleware);
+// apiRouter.use(authMiddleware);
+apiRouter.use(authenticateJwtToken);
 
 //authentication profile
 apiRouter.get("/api/auth/profile", AuthenticationController.profile);
 apiRouter.patch("/api/auth/profile", AuthenticationController.update);
-apiRouter.delete("/api/auth/logout", AuthenticationController.logout);
+// apiRouter.delete("/api/auth/logout", AuthenticationController.logout); //tidak perlu accesToken karena yang dipakai refresh token
+// apiRouter.post("/api/auth/refresh", AuthenticationController.refresh); //tidak perlu accessToken karena yang dipakai refresh token
 
 //category
 apiRouter.post("/api/categories", CategoryController.create);

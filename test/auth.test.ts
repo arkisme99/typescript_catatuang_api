@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { web } from "../src/application/web";
 import { logger } from "../src/application/logging";
-import { UserTest } from "./test-util";
+import { RefreshTokenTest, UserTest } from "./test-util";
 import bcrypt from "bcrypt";
 
 describe("POST /api/auth/register", () => {
@@ -71,6 +71,7 @@ describe("POST /api/auth/login", () => {
   });
 
   afterEach(async () => {
+    await RefreshTokenTest.deleteAll();
     await UserTest.delete();
   });
 
@@ -122,8 +123,8 @@ describe("POST /api/auth/login", () => {
         username: "test",
         password: "test",
       });
-
-      await UserTest.delete();
+      // await RefreshTokenTest.deleteAll();
+      // await UserTest.delete();
     }
 
     // request ke-4 harus ditolak
@@ -140,18 +141,22 @@ describe("POST /api/auth/login", () => {
 });
 
 describe("GET /api/auth/profile", () => {
+  let token: string;
   beforeEach(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
   });
 
   afterEach(async () => {
+    await RefreshTokenTest.deleteAll();
     await UserTest.delete();
   });
 
   it("should be success get profile", async () => {
-    const response = await supertest(web).get("/api/auth/profile").set({
-      "X-API-TOKEN": "test",
-    });
+    const response = await supertest(web)
+      .get("/api/auth/profile")
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -162,9 +167,9 @@ describe("GET /api/auth/profile", () => {
   });
 
   it("should be reject get profile if token invalid", async () => {
-    const response = await supertest(web).get("/api/auth/profile").set({
-      "X-API-TOKEN": "salah",
-    });
+    const response = await supertest(web)
+      .get("/api/auth/profile")
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -175,20 +180,23 @@ describe("GET /api/auth/profile", () => {
 });
 
 describe("PATCH /api/auth/profile", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
+    // --> karena cukup 1x login saja setiap test, menghindari limit
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await UserTest.delete();
   });
 
   it("should be rejected update profile if request invalid", async () => {
     const response = await supertest(web)
       .patch("/api/auth/profile")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "",
         email: "",
@@ -205,9 +213,7 @@ describe("PATCH /api/auth/profile", () => {
   it("should be able rejected update profile if token invalid", async () => {
     const response = await supertest(web)
       .patch("/api/auth/profile")
-      .set({
-        "X-API-TOKEN": "salah",
-      })
+      .set("Authorization", `Bearer token-salah`)
       .send({
         name: "John Doe Baru",
       });
@@ -222,9 +228,7 @@ describe("PATCH /api/auth/profile", () => {
   it("should be able success update profile only name", async () => {
     const response = await supertest(web)
       .patch("/api/auth/profile")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "John Doe Baru",
       });
@@ -240,9 +244,7 @@ describe("PATCH /api/auth/profile", () => {
   it("should be able success update profile password and email", async () => {
     const response = await supertest(web)
       .patch("/api/auth/profile")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         email: "john@new.com",
         password: "passwordbaru",
@@ -253,27 +255,56 @@ describe("PATCH /api/auth/profile", () => {
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBeDefined();
     expect(response.body.data.username).toBe("test");
-    expect(response.body.data.name).toBe("Test Doe");
     expect(response.body.data.email).toBe("john@new.com");
-
     const user = await UserTest.get();
     expect(await bcrypt.compare("passwordbaru", user.password)).toBe(true);
   });
 });
 
 describe("DELETE /api/auth/logout", () => {
-  beforeEach(async () => {
+  // let token: string; // tidak perlu accessToken
+  let refreshCookie: string | undefined; //perlu kirim karena butuh cookies
+
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    // token = await UserTest.getToken(login);
+    refreshCookie = await UserTest.getRefreshToken(login);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await UserTest.delete();
   });
 
+  it("should reject logout if refresh token is wrong", async () => {
+    const response = await supertest(web)
+      .delete("/api/auth/logout")
+      .set("Cookie", "refreshToken=salah");
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Refresh token is invalid");
+    expect(response.body.errors).toBeNull();
+  });
+
+  it("should reject logout if refresh token not send", async () => {
+    const response = await supertest(web).delete("/api/auth/logout");
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Refresh token not found");
+    expect(response.body.errors).toBeNull();
+  });
+
   it("should be able logout success", async () => {
-    const response = await supertest(web).delete("/api/auth/logout").set({
-      "X-API-TOKEN": "test",
-    });
+    const response = await supertest(web)
+      .delete("/api/auth/logout")
+      .set("Cookie", refreshCookie!);
 
     logger.debug(response.body);
 
@@ -284,18 +315,10 @@ describe("DELETE /api/auth/logout", () => {
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBeDefined();
     expect(response.body.data).toBeNull();
-  });
-
-  it("should reject logout if token is wrong", async () => {
-    const response = await supertest(web).delete("/api/auth/logout").set({
-      "X-API-TOKEN": "salah",
-    });
-
-    logger.debug(response.body);
-
-    expect(response.status).toBe(401);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Unauthorized");
-    expect(response.body.errors).toBeNull();
+    expect(
+      (response.headers["set-cookie"] as unknown as string[]).some((c) =>
+        c.includes("refreshToken=;")
+      )
+    ).toBe(true);
   });
 });

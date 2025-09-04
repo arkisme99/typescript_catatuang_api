@@ -8,15 +8,44 @@
 
 ---
 
+**Request Body:**
+
+```json
+{
+  "id": 1, //Update API ini digunakan
+  "username": "johndoe", //untuk login
+  "name": "John Doe", //untuk login
+  "email": "john@example.com",
+  "password": "secret123"
+}
+```
+
+**Data Response:**
+
+```json
+{
+  "id": 1, //Update API ini digunakan
+  "username": "johndoe", //untuk login
+  "name": "John Doe", //untuk login
+  "email": "john@example.com",
+  "password": "secret123",
+  "token": "asfasfe123123asdfasdf....", //jwt token hanya tampil saat login n refres token
+  "created_at": "2025-01-01 10:00:55",
+  "updated_at": "2025-01-01 10:00:55"
+}
+```
+
 **Error Response (4xx / 5xx):**
 
 ```json
 {
   "success": false,
-  "message": "Invalid email or password",
+  "message": "Something Errors",
   "errors": null
 }
 ```
+
+- [Back To Top](#authentication-api-spec)
 
 ---
 
@@ -27,12 +56,7 @@
 **Request Body :**
 
 ```json
-{
-  "username": "johndoe",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "secret123"
-}
+//Request Body
 ```
 
 **Success Response (201):**
@@ -41,13 +65,7 @@
 {
   "success": true,
   "message": "User registered successfully",
-  "data": {
-    "id": 1,
-    "username": "johndoe",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "avatar": null
-  }
+  "data": // Data Response
 }
 ```
 
@@ -60,10 +78,7 @@
 **Request Body :**
 
 ```json
-{
-  "username": "johndoe",
-  "password": "secret123"
-}
+//Request Body [username, password]
 ```
 
 **Success Response (200):**
@@ -72,11 +87,11 @@
 {
   "success": true,
   "message": "Login successful",
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
-  }
+  "data": //Data Response
 }
 ```
+
+- [Back To Top](#authentication-api-spec)
 
 ## Logout
 
@@ -84,7 +99,7 @@
 
 **Request Header :**
 
-- X-API-TOKEN : token
+- Authorization: Bearer <token>
 
 **Success Response (200):**
 
@@ -96,6 +111,8 @@
 }
 ```
 
+- [Back To Top](#authentication-api-spec)
+
 ---
 
 ## Profile
@@ -104,7 +121,7 @@
 
 **Request Header :**
 
-- X-API-TOKEN : token
+- Authorization: Bearer <token>
 
 **Success Response (200):**
 
@@ -112,14 +129,11 @@
 {
   "success": true,
   "message": "Get User Profile Success",
-  "data": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com",
-    "avatar": null
-  }
+  "data": //Data Response
 }
 ```
+
+- [Back To Top](#authentication-api-spec)
 
 ---
 
@@ -129,17 +143,12 @@
 
 **Request Header :**
 
-- X-API-TOKEN : token
+- Authorization: Bearer <token>
 
 **Request Body :**
 
 ```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "secret123",
-  "avatar": null
-}
+//Request Body, optional
 ```
 
 **Success Response (200):**
@@ -148,14 +157,10 @@
 {
   "success": true,
   "message": "Update Profile Success",
-  "data": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "secret123",
-    "avatar": null
-  }
+  "data": //Data response
 }
 ```
+
+- [Back To Top](#authentication-api-spec)
 
 ---

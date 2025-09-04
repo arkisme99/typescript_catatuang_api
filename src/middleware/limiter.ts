@@ -2,7 +2,7 @@ import rateLimit from "express-rate-limit";
 
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 menit
-  max: 5, // max 5 request per IP
+  max: 3, // max 3 request per IP
   message: {
     status: 429,
     error: "Terlalu banyak percobaan login. Coba lagi setelah 15 menit.",

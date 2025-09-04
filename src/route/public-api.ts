@@ -13,3 +13,14 @@ publicRouter.post(
   loginLimiter,
   AuthenticationController.login
 );
+
+publicRouter.delete(
+  "/api/auth/logout",
+  loginLimiter,
+  AuthenticationController.logout
+);
+publicRouter.post(
+  "/api/auth/refresh",
+  loginLimiter,
+  AuthenticationController.refresh
+);

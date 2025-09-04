@@ -143,11 +143,7 @@ export class AuthService {
     return toUserResponse(updateUser);
   }
 
-  static async logout(
-    user: User,
-    fullRequest: Request,
-    res: Response
-  ): Promise<UserResponse> {
+  static async logout(fullRequest: Request, res: Response): Promise<null> {
     /* const result = await prismaClient.user.update({
       where: {
         username: user.username,
@@ -157,7 +153,18 @@ export class AuthService {
       },
     }); */
 
+    // console.debug(`cookies: ${fullRequest.cookies}`);
     const refreshToken = fullRequest.cookies.refreshToken;
+    if (!refreshToken) throw new ResponseError(404, "Refresh token not found");
+
+    //cek refresh-token ada ga di db
+    const tokenRecord = await prismaClient.refreshToken.findUnique({
+      where: { token: refreshToken },
+    });
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+      throw new ResponseError(403, "Refresh token is invalid");
+    }
+
     //revoke token
     await prismaClient.refreshToken.update({
       where: { token: refreshToken },
@@ -169,16 +176,14 @@ export class AuthService {
       secure: true,
       sameSite: "strict",
     });
-    res.sendStatus(204);
 
-    return toUserResponse(user);
+    return null;
   }
 
   static async refresh(
-    user: User,
     fullRequest: Request,
     res: Response
-  ): Promise<UserResponse> {
+  ): Promise<{ token: string }> {
     const refreshToken = fullRequest.cookies.refreshToken;
     if (!refreshToken) throw new ResponseError(401, "Refresh token not found");
 
@@ -201,8 +206,11 @@ export class AuthService {
       }
     );
 
-    const response = toUserResponse(user);
-    response.token = accessToken!;
-    return response;
+    // const response = toUserResponse(user);
+    // response.token = accessToken!;
+    const result = {
+      token: accessToken!,
+    };
+    return result;
   }
 }

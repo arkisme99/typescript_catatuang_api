@@ -60,11 +60,23 @@ export class AuthenticationController {
     }
   }
 
-  static async logout(req: UserRequest, res: Response, next: NextFunction) {
+  static async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const fullRequest = req;
-      await AuthService.logout(req.user!, fullRequest, res);
+      await AuthService.logout(fullRequest, res);
       res.status(200).json(successResponse("Logout successful", null)); //data == null karena sudah logout tidak perlu tampil data lagi
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const fullRequest = req;
+      const response = await AuthService.refresh(fullRequest, res);
+      res
+        .status(200)
+        .json(successResponse("Refresh Token successful", response));
     } catch (e) {
       next(e);
     }
