@@ -62,8 +62,9 @@ npm run start
 ## 5. Teknologi Yang Digunakan
 
 - Node.js & TypeScript
-- Express.js (jika digunakan, tuliskan)
+- Express.js
 - Prisma untuk ORM
-- Jest atau framework testing lainnya
+- Jest untuk Unit Test
 - Pattern arsitektur: MVC + Service Layer
+- Implementasi JWT Token
 - Implementasi rate limiter di login & register
