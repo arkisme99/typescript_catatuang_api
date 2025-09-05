@@ -18,6 +18,7 @@ import {
 } from "../helpers/jwt-helper";
 import { Request, Response } from "express";
 import { ENV } from "../helpers/env";
+import { UserRequest } from "../type/user-request";
 
 export class AuthService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -185,32 +186,60 @@ export class AuthService {
     res: Response
   ): Promise<{ token: string }> {
     const refreshToken = fullRequest.cookies.refreshToken;
-    if (!refreshToken) throw new ResponseError(401, "Refresh token not found");
+    if (!refreshToken) {
+      throw new ResponseError(404, "Refresh token not found");
+    }
 
     // cek token ada di DB
     const tokenRecord = await prismaClient.refreshToken.findUnique({
       where: { token: refreshToken },
     });
+
     if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
       throw new ResponseError(403, "Refresh token is invalid");
     }
 
-    // verifikasi JWT
-    let accessToken = "";
-    jwt.verify(
-      refreshToken,
-      ENV.JWT_REFRESH_SECRET,
-      async (err: any, user: any) => {
-        if (err) throw new ResponseError(403, "Refresh token is invalid");
-        accessToken = await generateAccessToken(user);
-      }
-    );
+    // verifikasi JWT (synchronous)
+    let decoded: any;
+    try {
+      decoded = jwt.verify(refreshToken, ENV.JWT_REFRESH_SECRET);
+    } catch (err) {
+      throw new ResponseError(403, "Refresh token is invalid");
+    }
 
-    // const response = toUserResponse(user);
-    // response.token = accessToken!;
-    const result = {
-      token: accessToken!,
-    };
-    return result;
+    // generate access token baru
+    const accessToken = await generateAccessToken({
+      id: decoded.id,
+      username: decoded.username,
+      name: decoded.name,
+    });
+
+    // (opsional) rotasi refresh token baru
+    const newRefreshToken = jwt.sign(
+      { id: decoded.id, username: decoded.username, name: decoded.name },
+      ENV.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+    await prismaClient.refreshToken.update({
+      where: { token: refreshToken },
+      data: {
+        token: newRefreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    // set ulang refreshToken ke cookie (pakai yang lama atau baru kalau rotasi)
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true, // aktifkan true kalau pakai https
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+    });
+
+    // console.debug(`refreshToken: ${refreshToken}`);
+    // console.debug(`newRefreshToken: ${newRefreshToken}`);
+    // console.debug(`accessToken: ${accessToken}`);
+
+    return { token: accessToken };
   }
 }

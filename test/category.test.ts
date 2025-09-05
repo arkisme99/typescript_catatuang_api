@@ -1,15 +1,18 @@
 import supertest from "supertest";
-import { CategoryTest, UserTest } from "./test-util";
-import { response } from "express";
+import { CategoryTest, RefreshTokenTest, UserTest } from "./test-util";
 import { logger } from "../src/application/logging";
 import { web } from "../src/application/web";
 
 describe("POST /api/categories", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
   });
@@ -17,9 +20,7 @@ describe("POST /api/categories", () => {
   it("should reject create categories if invalid request", async () => {
     const response = await supertest(web)
       .post("/api/categories")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "",
         type: "asdasfvagfa agvsgfabgabg gbagbabtgatgbaga a gagae ga gagzadfg afeg aefg afgaga fga dg a",
@@ -35,9 +36,7 @@ describe("POST /api/categories", () => {
   it("should reject create categories if token wrong", async () => {
     const response = await supertest(web)
       .post("/api/categories")
-      .set({
-        "X-API-TOKEN": "salah",
-      })
+      .set("Authorization", `Bearer token-salah`)
       .send({
         name: "Gaji Kantor",
         type: "income",
@@ -53,9 +52,7 @@ describe("POST /api/categories", () => {
   it("should be able create categories", async () => {
     const response = await supertest(web)
       .post("/api/categories")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "Gaji Kantor",
         type: "income",
@@ -71,12 +68,16 @@ describe("POST /api/categories", () => {
 });
 
 describe("GET /api/categories", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
   });
@@ -85,9 +86,7 @@ describe("GET /api/categories", () => {
     const category = await CategoryTest.get();
     const response = await supertest(web)
       .get(`/api/categories/${category.id}`)
-      .set({
-        "X-API-TOKEN": "salah",
-      });
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -100,9 +99,7 @@ describe("GET /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .get(`/api/categories/${contact.name}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(400);
@@ -115,9 +112,7 @@ describe("GET /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .get(`/api/categories/${contact.id + 1}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(404);
@@ -130,9 +125,7 @@ describe("GET /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .get(`/api/categories/${contact.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -145,12 +138,16 @@ describe("GET /api/categories", () => {
 });
 
 describe("PUT /api/categories", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
   });
@@ -159,9 +156,7 @@ describe("PUT /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .put(`/api/categories/${contact.id}`)
-      .set({
-        "X-API-TOKEN": "salah",
-      })
+      .set("Authorization", `Bearer token-salah`)
       .send({
         name: "Gaji Kantor Edited",
         type: "income",
@@ -178,9 +173,7 @@ describe("PUT /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .put(`/api/categories/${contact.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "",
         type: "asdasfvagfa agvsgfabgabg gbagbabtgatgbaga a gagae ga gagzadfg afeg aefg afgaga fga dg a",
@@ -197,9 +190,7 @@ describe("PUT /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .put(`/api/categories/${contact.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         name: "Gaji Kantor Edited",
         type: "income edited",
@@ -216,12 +207,16 @@ describe("PUT /api/categories", () => {
 });
 
 describe("DELETE /api/categories", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
   });
@@ -230,9 +225,7 @@ describe("DELETE /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .delete(`/api/categories/${contact.id}`)
-      .set({
-        "X-API-TOKEN": "salah",
-      });
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -245,9 +238,7 @@ describe("DELETE /api/categories", () => {
     const contact = await CategoryTest.get();
     const response = await supertest(web)
       .delete(`/api/categories/${contact.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -258,19 +249,23 @@ describe("DELETE /api/categories", () => {
 });
 
 describe("Get /api/categories", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
   });
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
   });
 
   it("should be able search data", async () => {
-    const response = await supertest(web).get(`/api/categories`).set({
-      "X-API-TOKEN": "test",
-    });
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -285,9 +280,7 @@ describe("Get /api/categories", () => {
   it("should be able search data if name exist", async () => {
     const response = await supertest(web)
       .get(`/api/categories`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         name: "Kantor",
       });
@@ -305,9 +298,7 @@ describe("Get /api/categories", () => {
   it("should be able search data if type exist", async () => {
     const response = await supertest(web)
       .get(`/api/categories`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         type: "income",
       });
@@ -325,9 +316,7 @@ describe("Get /api/categories", () => {
   it("should be able search data if name and type exist", async () => {
     const response = await supertest(web)
       .get(`/api/categories`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         name: "Kantor",
         type: "income",
@@ -346,9 +335,7 @@ describe("Get /api/categories", () => {
   it("should be able to search category no result", async () => {
     const response = await supertest(web)
       .get(`/api/categories`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         name: "salah",
       });
@@ -366,9 +353,7 @@ describe("Get /api/categories", () => {
   it("should be able to search category with paging", async () => {
     const response = await supertest(web)
       .get(`/api/categories`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         page: 2,
         size: 1,
@@ -386,9 +371,9 @@ describe("Get /api/categories", () => {
   });
 
   it("should reject if token is wrong", async () => {
-    const response = await supertest(web).get(`/api/categories`).set({
-      "X-API-TOKEN": "salah",
-    });
+    const response = await supertest(web)
+      .get(`/api/categories`)
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);

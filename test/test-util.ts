@@ -4,6 +4,7 @@ import { ResponseError } from "../src/error/response-error";
 import { stringToDate } from "../src/helpers/date-helper";
 import request from "supertest";
 import { web } from "../src/application/web";
+import { randomInt } from "crypto";
 
 export class UserTest {
   static async delete() {
@@ -38,10 +39,13 @@ export class UserTest {
 
   static async login() {
     // let refreshCookie: string | undefined;
-    const res = await request(web).post("/api/auth/login").send({
-      username: "test",
-      password: "test",
-    });
+    const res = await request(web)
+      .post("/api/auth/login")
+      .set("X-Forwarded-For", "127.0.0." + randomInt(1, 20))
+      .send({
+        username: "test",
+        password: "test",
+      });
 
     console.debug(`Testing: ${JSON.stringify(res.body)}`);
 

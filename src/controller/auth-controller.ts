@@ -72,8 +72,9 @@ export class AuthenticationController {
 
   static async refresh(req: Request, res: Response, next: NextFunction) {
     try {
-      const fullRequest = req;
-      const response = await AuthService.refresh(fullRequest, res);
+      // const user = req.user!;
+      // const fullRequest = req;
+      const response = await AuthService.refresh(req, res);
       res
         .status(200)
         .json(successResponse("Refresh Token successful", response));

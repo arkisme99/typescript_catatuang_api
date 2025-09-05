@@ -1,15 +1,24 @@
 import supertest from "supertest";
-import { CategoryTest, TransactionTest, UserTest } from "./test-util";
+import {
+  CategoryTest,
+  RefreshTokenTest,
+  TransactionTest,
+  UserTest,
+} from "./test-util";
 import { web } from "../src/application/web";
 import { logger } from "../src/application/logging";
-import { formatDateString, stringToDate } from "../src/helpers/date-helper";
+import { formatDateString } from "../src/helpers/date-helper";
 describe("POST /api/transactions", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await TransactionTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
@@ -20,9 +29,7 @@ describe("POST /api/transactions", () => {
 
     const response = await supertest(web)
       .post("/api/transactions")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         transaction_date: "2025-07-29",
         user_id: user.id,
@@ -55,9 +62,7 @@ describe("POST /api/transactions", () => {
 
     const response = await supertest(web)
       .post("/api/transactions")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         transaction_date: "",
         user_id: user.id,
@@ -81,9 +86,7 @@ describe("POST /api/transactions", () => {
 
     const response = await supertest(web)
       .post("/api/transactions")
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         transaction_date: "2025-07-29",
         user_id: user.id,
@@ -107,9 +110,7 @@ describe("POST /api/transactions", () => {
 
     const response = await supertest(web)
       .post("/api/transactions")
-      .set({
-        "X-API-TOKEN": "salah",
-      })
+      .set("Authorization", `Bearer token-salah`)
       .send({
         transaction_date: "2025-07-29",
         user_id: user.id,
@@ -129,13 +130,17 @@ describe("POST /api/transactions", () => {
 });
 
 describe("GET /api/transactions", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
     await TransactionTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await TransactionTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
@@ -145,9 +150,7 @@ describe("GET /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .get(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "salah",
-      });
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -160,9 +163,7 @@ describe("GET /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .get(`/api/transactions/${transaction.transaction_date}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(400);
@@ -175,9 +176,7 @@ describe("GET /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .get(`/api/transactions/${transaction.id + 1}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(404);
@@ -193,9 +192,7 @@ describe("GET /api/transactions", () => {
 
     const response = await supertest(web)
       .get(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -215,13 +212,17 @@ describe("GET /api/transactions", () => {
 });
 
 describe("PUT /api/transactions", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
     await TransactionTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await TransactionTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
@@ -232,9 +233,7 @@ describe("PUT /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .put(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "salah",
-      })
+      .set("Authorization", `Bearer token-salah`)
       .send({
         description: "Gaji Bulan Juli 2025 edited",
         amount: 17500000,
@@ -252,9 +251,7 @@ describe("PUT /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .put(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         description: "",
         month: "6",
@@ -274,9 +271,7 @@ describe("PUT /api/transactions", () => {
     const category = await CategoryTest.get();
     const response = await supertest(web)
       .put(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .send({
         transaction_date: "2025-07-29",
         category_id: category.id,
@@ -299,13 +294,17 @@ describe("PUT /api/transactions", () => {
 });
 
 describe("DELETE /api/transactions", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
     await TransactionTest.create();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await TransactionTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
@@ -315,9 +314,7 @@ describe("DELETE /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .delete(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "salah",
-      });
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -330,9 +327,7 @@ describe("DELETE /api/transactions", () => {
     const transaction = await TransactionTest.get();
     const response = await supertest(web)
       .delete(`/api/transactions/${transaction.id}`)
-      .set({
-        "X-API-TOKEN": "test",
-      });
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -343,21 +338,25 @@ describe("DELETE /api/transactions", () => {
 });
 
 describe("Get /api/transactions", () => {
-  beforeEach(async () => {
+  let token: string;
+  beforeAll(async () => {
     await UserTest.create();
+    const login = await UserTest.login();
+    token = await UserTest.getToken(login);
     await CategoryTest.create();
     await TransactionTest.create();
   });
-  afterEach(async () => {
+  afterAll(async () => {
+    await RefreshTokenTest.deleteAll();
     await TransactionTest.deleteAll();
     await CategoryTest.deleteAll();
     await UserTest.delete();
   });
 
   it("should be able search data transaction", async () => {
-    const response = await supertest(web).get(`/api/transactions`).set({
-      "X-API-TOKEN": "test",
-    });
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -372,9 +371,7 @@ describe("Get /api/transactions", () => {
   it("should be able search data if transaction_date exist", async () => {
     const response = await supertest(web)
       .get(`/api/transactions`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         transaction_date: "2025-07-29",
       });
@@ -392,9 +389,7 @@ describe("Get /api/transactions", () => {
   it("should be able search data if description exist", async () => {
     const response = await supertest(web)
       .get(`/api/transactions`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         description: "Gaji Bulan Juli 2025",
       });
@@ -412,9 +407,7 @@ describe("Get /api/transactions", () => {
   it("should be able search data if amount exist", async () => {
     const response = await supertest(web)
       .get(`/api/transactions`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         amount: 15955650.35,
       });
@@ -432,9 +425,7 @@ describe("Get /api/transactions", () => {
   it("should be able search data if month and year exist", async () => {
     const response = await supertest(web)
       .get(`/api/transactions`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         month: 7,
         year: 2025,
@@ -453,9 +444,7 @@ describe("Get /api/transactions", () => {
   it("should be able to search transaction no result", async () => {
     const response = await supertest(web)
       .get(`/api/transactions`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         description: "salah",
       });
@@ -473,9 +462,7 @@ describe("Get /api/transactions", () => {
   it("should be able to search transaction with paging", async () => {
     const response = await supertest(web)
       .get(`/api/transactions`)
-      .set({
-        "X-API-TOKEN": "test",
-      })
+      .set("Authorization", `Bearer ${token}`)
       .query({
         page: 2,
         size: 1,
@@ -492,9 +479,9 @@ describe("Get /api/transactions", () => {
   });
 
   it("should reject if token is wrong", async () => {
-    const response = await supertest(web).get(`/api/transactions`).set({
-      "X-API-TOKEN": "salah",
-    });
+    const response = await supertest(web)
+      .get(`/api/transactions`)
+      .set("Authorization", `Bearer token-salah`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
