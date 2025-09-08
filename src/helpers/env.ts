@@ -12,6 +12,7 @@ function requireEnv(key: keyof NodeJS.ProcessEnv): string {
 }
 
 export const ENV = {
+  FRONTEND_URL: requireEnv("FRONTEND_URL"),
   DATABASE_URL: requireEnv("DATABASE_URL"),
   JWT_SECRET: requireEnv("JWT_SECRET"),
   JWT_REFRESH_SECRET: requireEnv("JWT_REFRESH_SECRET"),

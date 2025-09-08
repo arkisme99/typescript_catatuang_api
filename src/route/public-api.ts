@@ -1,6 +1,10 @@
 import express from "express";
 import { AuthenticationController } from "../controller/auth-controller";
-import { loginLimiter, registerLimiter } from "../middleware/limiter";
+import {
+  loginLimiter,
+  refreshLimiter,
+  registerLimiter,
+} from "../middleware/limiter";
 
 export const publicRouter = express.Router();
 publicRouter.post(
@@ -16,11 +20,11 @@ publicRouter.post(
 
 publicRouter.delete(
   "/api/auth/logout",
-  loginLimiter,
+  refreshLimiter,
   AuthenticationController.logout
 );
 publicRouter.post(
   "/api/auth/refresh",
-  loginLimiter,
+  refreshLimiter,
   AuthenticationController.refresh
 );

@@ -60,7 +60,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new ResponseError(401, "Username or password is wrong");
+      throw new ResponseError(400, "Username or password is wrong");
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -69,7 +69,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new ResponseError(401, "Username or password is wrong");
+      throw new ResponseError(400, "Username or password is wrong");
     }
 
     /* user = await prismaClient.user.update({
@@ -156,7 +156,7 @@ export class AuthService {
 
     // console.debug(`cookies: ${fullRequest.cookies}`);
     const refreshToken = fullRequest.cookies.refreshToken;
-    if (!refreshToken) throw new ResponseError(404, "Refresh token not found");
+    if (!refreshToken) throw new ResponseError(401, "Refresh token not found");
 
     //cek refresh-token ada ga di db
     const tokenRecord = await prismaClient.refreshToken.findUnique({
@@ -187,7 +187,7 @@ export class AuthService {
   ): Promise<{ token: string }> {
     const refreshToken = fullRequest.cookies.refreshToken;
     if (!refreshToken) {
-      throw new ResponseError(404, "Refresh token not found");
+      throw new ResponseError(401, "Refresh token not found");
     }
 
     // cek token ada di DB
